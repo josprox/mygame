@@ -33,6 +33,7 @@ class HangmanController:
     def update_view(self):
         masked = self.model.get_masked_word()
         self.view.update_ui(masked, self.model.attempts_left, self.model.description, self.model.game_over)
+        self.view.draw_hangman(self.model.attempts_left, self.model.max_attempts)
 
     def go_back(self):
         self.main_controller.show_menu()

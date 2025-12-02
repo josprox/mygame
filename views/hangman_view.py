@@ -53,6 +53,10 @@ class HangmanView(ttk.Frame):
         top_frame.pack(fill='x', pady=10)
         ttk.Button(top_frame, text="Rendirse / Volver", command=self.controller.go_back).pack(side='left', padx=10)
         
+        # Canvas for drawing Hangman
+        self.canvas = tk.Canvas(self.game_frame, width=200, height=250, bg='white')
+        self.canvas.pack(pady=10)
+        
         self.info_label = ttk.Label(self.game_frame, text="", font=("Helvetica", 12))
         self.info_label.pack(pady=5)
         
@@ -100,10 +104,52 @@ class HangmanView(ttk.Frame):
     def guess_action(self, char):
         self.controller.guess_letter(char)
 
+    def draw_hangman(self, attempts_left, max_attempts):
+        self.canvas.delete("all")
+        # Draw gallows
+        self.canvas.create_line(50, 230, 150, 230, width=3) # Base
+        self.canvas.create_line(100, 230, 100, 50, width=3) # Pole
+        self.canvas.create_line(100, 50, 150, 50, width=3)  # Top
+        self.canvas.create_line(150, 50, 150, 80, width=3)  # Rope
+        
+        errors = max_attempts - attempts_left
+        
+        # Calculate steps based on max_attempts (simplified for standard 6 parts)
+        # If max_attempts is different, we map errors to parts.
+        # Let's assume standard 6 parts for the drawing, and map progress.
+        
+        # Parts: Head, Body, Left Arm, Right Arm, Left Leg, Right Leg
+        # We show parts based on percentage of errors? Or just map 1-6.
+        # Let's stick to standard 6 parts. If user sets 10 attempts, we draw slowly?
+        # For simplicity, let's draw based on ratio or just map to 6 stages.
+        
+        stage = int((errors / max_attempts) * 6) if max_attempts > 0 else 0
+        if errors > 0 and stage == 0: stage = 1 # Show at least something if error
+        
+        if stage >= 1: # Head
+            self.canvas.create_oval(130, 80, 170, 120, width=3)
+        if stage >= 2: # Body
+            self.canvas.create_line(150, 120, 150, 180, width=3)
+        if stage >= 3: # Left Arm
+            self.canvas.create_line(150, 140, 130, 160, width=3)
+        if stage >= 4: # Right Arm
+            self.canvas.create_line(150, 140, 170, 160, width=3)
+        if stage >= 5: # Left Leg
+            self.canvas.create_line(150, 180, 130, 210, width=3)
+        if stage >= 6: # Right Leg
+            self.canvas.create_line(150, 180, 170, 210, width=3)
+
     def update_ui(self, masked_word, attempts, description, game_over=False):
         self.word_label.config(text=masked_word)
         self.status_label.config(text=f"Intentos restantes: {attempts}")
         self.info_label.config(text=f"Pista: {description}")
+        
+        # We need max_attempts to draw correctly. 
+        # Since we don't store it in view, we might need to ask controller or pass it.
+        # For now, let's assume standard 6 or get it from controller if possible.
+        # Better: Update update_ui signature in controller to pass max_attempts.
+        # Or just use attempts_left and assume max is attempts_left + errors? No.
+        # I'll update the controller to pass max_attempts.
         
         if game_over:
             for btn in self.letter_buttons.values():

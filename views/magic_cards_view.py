@@ -39,19 +39,28 @@ class MagicCardsView(ttk.Frame):
         ttk.Button(self.intro_frame, text="Volver", command=self.controller.go_back).pack()
 
     def create_game_ui(self):
-        self.card_label = ttk.Label(self.game_frame, text="Carta X", font=("Helvetica", 16))
-        self.card_label.pack(pady=20)
+        # Card Container (Styled Frame)
+        self.card_frame = tk.Frame(self.game_frame, bg="white", bd=2, relief="raised")
+        self.card_frame.pack(pady=20, padx=50, ipadx=20, ipady=20)
         
-        self.numbers_text = tk.Text(self.game_frame, height=8, width=30, font=("Courier", 14))
-        self.numbers_text.pack(pady=10)
-        self.numbers_text.config(state='disabled')
+        self.card_label = tk.Label(self.card_frame, text="Carta X", font=("Times New Roman", 18, "bold"), bg="white", fg="darkred")
+        self.card_label.pack(pady=10)
+        
+        # Numbers display
+        self.numbers_label = tk.Label(self.card_frame, text="", font=("Courier New", 16), bg="white", justify="center")
+        self.numbers_label.pack(pady=10)
         
         ttk.Label(self.game_frame, text="¿Está tu número en esta carta?").pack(pady=10)
         
         btn_frame = ttk.Frame(self.game_frame)
         btn_frame.pack(pady=10)
-        ttk.Button(btn_frame, text="SÍ", command=lambda: self.controller.answer(True)).pack(side='left', padx=20)
-        ttk.Button(btn_frame, text="NO", command=lambda: self.controller.answer(False)).pack(side='left', padx=20)
+        
+        # Styled Buttons (using ttk styles if possible, or just standard buttons for color)
+        yes_btn = tk.Button(btn_frame, text="SÍ", font=("Helvetica", 12, "bold"), bg="#4CAF50", fg="white", width=10, command=lambda: self.controller.answer(True))
+        yes_btn.pack(side='left', padx=20)
+        
+        no_btn = tk.Button(btn_frame, text="NO", font=("Helvetica", 12, "bold"), bg="#F44336", fg="white", width=10, command=lambda: self.controller.answer(False))
+        no_btn.pack(side='left', padx=20)
 
     def create_result_ui(self):
         self.result_label = ttk.Label(self.result_frame, text="", font=("Helvetica", 30, "bold"))
@@ -60,15 +69,12 @@ class MagicCardsView(ttk.Frame):
         ttk.Button(self.result_frame, text="Volver al Menú", command=self.controller.go_back).pack(pady=10)
 
     def update_card(self, index, numbers):
-        self.card_label.config(text=f"Carta {index + 1}")
+        self.card_label.config(text=f"CARTA {index + 1}")
         
         # Format numbers nicely
         content = ""
         for i in range(0, len(numbers), 4):
             row = numbers[i:i+4]
-            content += " ".join(f"{num:^6}" for num in row) + "\n"
+            content += " ".join(f"{num:^4}" for num in row) + "\n"
             
-        self.numbers_text.config(state='normal')
-        self.numbers_text.delete(1.0, tk.END)
-        self.numbers_text.insert(tk.END, content)
-        self.numbers_text.config(state='disabled')
+        self.numbers_label.config(text=content)
