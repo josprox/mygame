@@ -1,12 +1,12 @@
 from models.river_model import RiverModel
 from views.river_view import RiverView
-import tkinter.messagebox as messagebox
+from PySide6.QtWidgets import QMessageBox
 
 class RiverController:
     def __init__(self, main_controller):
         self.main_controller = main_controller
         self.model = RiverModel()
-        self.view = RiverView(main_controller.root, self)
+        self.view = RiverView(main_controller.window, self)
 
     def get_view(self):
         return self.view
@@ -24,9 +24,9 @@ class RiverController:
         
         if self.model.game_over:
             if self.model.won:
-                messagebox.showinfo("¡Victoria!", self.model.message)
+                QMessageBox.information(self.view, "¡Victoria!", self.model.message)
             else:
-                messagebox.showerror("Game Over", self.model.message)
+                QMessageBox.critical(self.view, "Game Over", self.model.message)
                 self.reset_game()
 
     def update_view(self):

@@ -1,80 +1,147 @@
-import tkinter as tk
-from tkinter import ttk
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+                               QPushButton, QFrame, QGraphicsDropShadowEffect)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QFont
 
-class MagicCardsView(ttk.Frame):
+class MagicCardsView(QWidget):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         
-        self.intro_frame = ttk.Frame(self)
-        self.game_frame = ttk.Frame(self)
-        self.result_frame = ttk.Frame(self)
+        self.layout = QVBoxLayout(self)
+        self.layout.setAlignment(Qt.AlignCenter)
+        
+        self.intro_widget = QWidget()
+        self.game_widget = QWidget()
+        self.result_widget = QWidget()
         
         self.create_intro_ui()
         self.create_game_ui()
         self.create_result_ui()
         
+        self.layout.addWidget(self.intro_widget)
+        self.layout.addWidget(self.game_widget)
+        self.layout.addWidget(self.result_widget)
+        
         self.show_intro()
 
     def show_intro(self):
-        self.game_frame.pack_forget()
-        self.result_frame.pack_forget()
-        self.intro_frame.pack(fill='both', expand=True)
+        self.game_widget.hide()
+        self.result_widget.hide()
+        self.intro_widget.show()
 
     def show_game(self):
-        self.intro_frame.pack_forget()
-        self.result_frame.pack_forget()
-        self.game_frame.pack(fill='both', expand=True)
+        self.intro_widget.hide()
+        self.result_widget.hide()
+        self.game_widget.show()
 
     def show_result(self, number):
-        self.intro_frame.pack_forget()
-        self.game_frame.pack_forget()
-        self.result_label.config(text=f"¡Tu número es el {number}!")
-        self.result_frame.pack(fill='both', expand=True)
+        self.intro_widget.hide()
+        self.game_widget.hide()
+        self.result_label.setText(f"¡Tu número es el {number}!")
+        self.result_widget.show()
 
     def create_intro_ui(self):
-        ttk.Label(self.intro_frame, text="Cartas Mágicas", font=("Helvetica", 24)).pack(pady=30)
-        ttk.Label(self.intro_frame, text="Piensa en un número del 1 al 31.", font=("Helvetica", 14)).pack(pady=10)
-        ttk.Button(self.intro_frame, text="¡Estoy listo!", command=self.controller.start_game).pack(pady=20)
-        ttk.Button(self.intro_frame, text="Volver", command=self.controller.go_back).pack()
+        layout = QVBoxLayout(self.intro_widget)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        title = QLabel("Cartas Mágicas")
+        title.setProperty("class", "title")
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+        
+        subtitle = QLabel("Piensa en un número del 1 al 31.")
+        subtitle.setProperty("class", "subtitle")
+        subtitle.setAlignment(Qt.AlignCenter)
+        layout.addWidget(subtitle)
+        
+        btn_start = QPushButton("¡Estoy listo!")
+        btn_start.setProperty("class", "accent")
+        btn_start.clicked.connect(self.controller.start_game)
+        layout.addWidget(btn_start)
+        
+        btn_back = QPushButton("Volver")
+        btn_back.clicked.connect(self.controller.go_back)
+        layout.addWidget(btn_back)
 
     def create_game_ui(self):
-        # Card Container (Styled Frame)
-        self.card_frame = tk.Frame(self.game_frame, bg="white", bd=2, relief="raised")
-        self.card_frame.pack(pady=20, padx=50, ipadx=20, ipady=20)
+        layout = QVBoxLayout(self.game_widget)
+        layout.setAlignment(Qt.AlignCenter)
         
-        self.card_label = tk.Label(self.card_frame, text="Carta X", font=("Times New Roman", 18, "bold"), bg="white", fg="darkred")
-        self.card_label.pack(pady=10)
+        # Card Frame
+        self.card_frame = QFrame()
+        self.card_frame.setFixedSize(300, 400)
+        self.card_frame.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border-radius: 15px;
+                border: 1px solid #ddd;
+            }
+        """)
         
-        # Numbers display
-        self.numbers_label = tk.Label(self.card_frame, text="", font=("Courier New", 16), bg="white", justify="center")
-        self.numbers_label.pack(pady=10)
+        # Shadow effect
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(20)
+        shadow.setColor(QColor(0, 0, 0, 80))
+        shadow.setOffset(0, 5)
+        self.card_frame.setGraphicsEffect(shadow)
         
-        ttk.Label(self.game_frame, text="¿Está tu número en esta carta?").pack(pady=10)
+        card_layout = QVBoxLayout(self.card_frame)
+        card_layout.setAlignment(Qt.AlignCenter)
         
-        btn_frame = ttk.Frame(self.game_frame)
-        btn_frame.pack(pady=10)
+        self.card_label = QLabel("Carta X")
+        self.card_label.setStyleSheet("color: darkred; font-size: 24px; font-weight: bold; border: none;")
+        self.card_label.setAlignment(Qt.AlignCenter)
+        card_layout.addWidget(self.card_label)
         
-        # Styled Buttons (using ttk styles if possible, or just standard buttons for color)
-        yes_btn = tk.Button(btn_frame, text="SÍ", font=("Helvetica", 12, "bold"), bg="#4CAF50", fg="white", width=10, command=lambda: self.controller.answer(True))
-        yes_btn.pack(side='left', padx=20)
+        self.numbers_label = QLabel("")
+        self.numbers_label.setStyleSheet("color: black; font-family: 'Courier New'; font-size: 18px; border: none;")
+        self.numbers_label.setAlignment(Qt.AlignCenter)
+        self.numbers_label.setWordWrap(True)
+        card_layout.addWidget(self.numbers_label)
         
-        no_btn = tk.Button(btn_frame, text="NO", font=("Helvetica", 12, "bold"), bg="#F44336", fg="white", width=10, command=lambda: self.controller.answer(False))
-        no_btn.pack(side='left', padx=20)
+        layout.addWidget(self.card_frame)
+        
+        layout.addWidget(QLabel("¿Está tu número en esta carta?"))
+        
+        btn_layout = QHBoxLayout()
+        
+        yes_btn = QPushButton("SÍ")
+        yes_btn.setStyleSheet("background-color: #4CAF50; border: none;")
+        yes_btn.clicked.connect(lambda: self.controller.answer(True))
+        btn_layout.addWidget(yes_btn)
+        
+        no_btn = QPushButton("NO")
+        no_btn.setStyleSheet("background-color: #F44336; border: none;")
+        no_btn.clicked.connect(lambda: self.controller.answer(False))
+        btn_layout.addWidget(no_btn)
+        
+        layout.addLayout(btn_layout)
 
     def create_result_ui(self):
-        self.result_label = ttk.Label(self.result_frame, text="", font=("Helvetica", 30, "bold"))
-        self.result_label.pack(pady=50)
-        ttk.Button(self.result_frame, text="Jugar de nuevo", command=self.show_intro).pack(pady=10)
-        ttk.Button(self.result_frame, text="Volver al Menú", command=self.controller.go_back).pack(pady=10)
+        layout = QVBoxLayout(self.result_widget)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        self.result_label = QLabel("")
+        self.result_label.setProperty("class", "title")
+        self.result_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.result_label)
+        
+        btn_again = QPushButton("Jugar de nuevo")
+        btn_again.setProperty("class", "accent")
+        btn_again.clicked.connect(self.show_intro)
+        layout.addWidget(btn_again)
+        
+        btn_back = QPushButton("Volver al Menú")
+        btn_back.clicked.connect(self.controller.go_back)
+        layout.addWidget(btn_back)
 
     def update_card(self, index, numbers):
-        self.card_label.config(text=f"CARTA {index + 1}")
+        self.card_label.setText(f"CARTA {index + 1}")
         
-        # Format numbers nicely
         content = ""
         for i in range(0, len(numbers), 4):
             row = numbers[i:i+4]
             content += " ".join(f"{num:^4}" for num in row) + "\n"
-            
-        self.numbers_label.config(text=content)
+        
+        self.numbers_label.setText(content)

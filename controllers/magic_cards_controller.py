@@ -5,7 +5,7 @@ class MagicCardsController:
     def __init__(self, main_controller):
         self.main_controller = main_controller
         self.model = MagicCardsModel()
-        self.view = MagicCardsView(main_controller.root, self)
+        self.view = MagicCardsView(main_controller.window, self)
 
     def get_view(self):
         return self.view

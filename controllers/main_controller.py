@@ -1,4 +1,4 @@
-import tkinter as tk
+from PySide6.QtWidgets import QMainWindow, QStackedWidget
 from views.main_menu_view import MainMenuView
 from controllers.hangman_controller import HangmanController
 from controllers.magic_cards_controller import MagicCardsController
@@ -6,42 +6,42 @@ from controllers.river_controller import RiverController
 
 class MainController:
     def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Colección de Juegos Python")
-        self.root.geometry("800x600")
+        self.window = QMainWindow()
+        self.window.setWindowTitle("Colección de Juegos Python")
+        self.window.resize(800, 600)
         
-        self.main_menu = MainMenuView(self.root, self)
+        self.stacked_widget = QStackedWidget()
+        self.window.setCentralWidget(self.stacked_widget)
+        
+        # Views
+        self.main_menu = MainMenuView(self.window, self)
+        self.stacked_widget.addWidget(self.main_menu)
         
         # Initialize controllers
         self.hangman_controller = HangmanController(self)
-        self.magic_cards_controller = MagicCardsController(self)
-        self.river_controller = RiverController(self)
+        self.stacked_widget.addWidget(self.hangman_controller.get_view())
         
-        self.current_view = None
+        self.magic_cards_controller = MagicCardsController(self)
+        self.stacked_widget.addWidget(self.magic_cards_controller.get_view())
+        
+        self.river_controller = RiverController(self)
+        self.stacked_widget.addWidget(self.river_controller.get_view())
+        
         self.show_menu()
 
     def show_menu(self):
-        if self.current_view:
-            self.current_view.pack_forget()
-        self.main_menu.pack(fill='both', expand=True)
-        self.current_view = self.main_menu
+        self.stacked_widget.setCurrentWidget(self.main_menu)
 
     def show_game(self, game_name):
-        if self.current_view:
-            self.current_view.pack_forget()
-            
         if game_name == "hangman":
-            self.current_view = self.hangman_controller.get_view()
-            # Reset/Setup hangman if needed? The view handles setup screen.
+            self.stacked_widget.setCurrentWidget(self.hangman_controller.get_view())
             self.hangman_controller.view.show_setup()
         elif game_name == "magic_cards":
-            self.current_view = self.magic_cards_controller.get_view()
+            self.stacked_widget.setCurrentWidget(self.magic_cards_controller.get_view())
             self.magic_cards_controller.view.show_intro()
         elif game_name == "river":
-            self.current_view = self.river_controller.get_view()
+            self.stacked_widget.setCurrentWidget(self.river_controller.get_view())
             self.river_controller.start_game()
-            
-        self.current_view.pack(fill='both', expand=True)
 
     def run(self):
-        self.root.mainloop()
+        self.window.show()

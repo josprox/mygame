@@ -1,12 +1,12 @@
 from models.hangman_model import HangmanModel
 from views.hangman_view import HangmanView
-import tkinter.messagebox as messagebox
+from PySide6.QtWidgets import QMessageBox
 
 class HangmanController:
     def __init__(self, main_controller):
         self.main_controller = main_controller
         self.model = HangmanModel()
-        self.view = HangmanView(main_controller.root, self)
+        self.view = HangmanView(main_controller.window, self) # Pass window as parent
 
     def get_view(self):
         return self.view
@@ -24,9 +24,9 @@ class HangmanController:
         if self.model.game_over:
             self.update_view()
             if self.model.won:
-                messagebox.showinfo("¡Ganaste!", message)
+                QMessageBox.information(self.view, "¡Ganaste!", message)
             else:
-                messagebox.showinfo("Perdiste", f"{message}\nLa palabra era: {self.model.secret_word}")
+                QMessageBox.information(self.view, "Perdiste", f"{message}\nLa palabra era: {self.model.secret_word}")
         else:
             self.update_view()
 

@@ -1,20 +1,57 @@
-import tkinter as tk
-from tkinter import ttk
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFrame, QSpacerItem, QSizePolicy
+from PySide6.QtCore import Qt
 
-class MainMenuView(ttk.Frame):
+class MainMenuView(QWidget):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(15)
+        
         # Title
-        title_label = ttk.Label(self, text="Colección de Juegos Python", font=("Helvetica", 24, "bold"))
-        title_label.pack(pady=40)
+        title = QLabel("Colección de Juegos Python")
+        title.setProperty("class", "title") # For CSS styling
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
         
-        # Buttons
-        btn_frame = ttk.Frame(self)
-        btn_frame.pack(pady=20)
+        subtitle = QLabel("Selecciona un juego para comenzar")
+        subtitle.setProperty("class", "subtitle")
+        subtitle.setAlignment(Qt.AlignCenter)
+        layout.addWidget(subtitle)
         
-        ttk.Button(btn_frame, text="El Ahorcado", command=lambda: controller.show_game("hangman")).pack(fill='x', pady=10, ipadx=20, ipady=5)
-        ttk.Button(btn_frame, text="Cartas Mágicas", command=lambda: controller.show_game("magic_cards")).pack(fill='x', pady=10, ipadx=20, ipady=5)
-        ttk.Button(btn_frame, text="El Río", command=lambda: controller.show_game("river")).pack(fill='x', pady=10, ipadx=20, ipady=5)
-        ttk.Button(btn_frame, text="Salir", command=parent.quit).pack(fill='x', pady=10, ipadx=20, ipady=5)
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Fixed))
+        
+        # Buttons Container
+        btn_container = QWidget()
+        btn_layout = QVBoxLayout(btn_container)
+        btn_layout.setSpacing(10)
+        
+        btn_hangman = QPushButton("El Ahorcado")
+        btn_hangman.setCursor(Qt.PointingHandCursor)
+        btn_hangman.setMinimumHeight(40)
+        btn_hangman.clicked.connect(lambda: controller.show_game("hangman"))
+        btn_layout.addWidget(btn_hangman)
+        
+        btn_magic = QPushButton("Cartas Mágicas")
+        btn_magic.setCursor(Qt.PointingHandCursor)
+        btn_magic.setMinimumHeight(40)
+        btn_magic.clicked.connect(lambda: controller.show_game("magic_cards"))
+        btn_layout.addWidget(btn_magic)
+        
+        btn_river = QPushButton("El Río")
+        btn_river.setCursor(Qt.PointingHandCursor)
+        btn_river.setMinimumHeight(40)
+        btn_river.clicked.connect(lambda: controller.show_game("river"))
+        btn_layout.addWidget(btn_river)
+        
+        layout.addWidget(btn_container)
+        
+        layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed))
+        
+        btn_exit = QPushButton("Salir")
+        btn_exit.setCursor(Qt.PointingHandCursor)
+        btn_exit.setProperty("class", "accent") # Example of accent style if desired, or maybe keep it neutral
+        btn_exit.clicked.connect(parent.close)
+        layout.addWidget(btn_exit)
