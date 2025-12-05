@@ -6,7 +6,7 @@ from PySide6.QtGui import QPainter, QPen, QColor, QFont
 class HangmanCanvas(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumSize(200, 250)
+        self.setMinimumSize(220, 260)
         self.attempts_left = 6
         self.max_attempts = 6
 
@@ -136,11 +136,14 @@ class HangmanView(QWidget):
         layout.addWidget(self.word_label)
         
         self.status_label = QLabel("Intentos restantes: 6")
+        self.status_label.setFont(QFont("Courier New", 18, QFont.Bold))
+        self.status_label.setContentsMargins(0, 10, 0, 0)
         self.status_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.status_label)
         
         # Keyboard
         self.keyboard_layout = QGridLayout()
+        self.keyboard_layout.setContentsMargins(0, 10, 0, 0)
         self.keyboard_layout.setSpacing(5)
         layout.addLayout(self.keyboard_layout)
         
@@ -150,7 +153,7 @@ class HangmanView(QWidget):
         col = 0
         for char in letters:
             btn = QPushButton(char)
-            btn.setFixedSize(40, 40)
+            btn.setFixedSize(60, 60)
             btn.clicked.connect(lambda checked=False, c=char: self.guess_action(c))
             self.keyboard_layout.addWidget(btn, row, col)
             self.letter_buttons[char] = btn
